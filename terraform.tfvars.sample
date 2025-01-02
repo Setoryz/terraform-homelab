@@ -1,0 +1,15 @@
+pm_api_url          = 
+pm_api_token_id     = 
+pm_api_token_secret = 
+
+cloudinit_user     = 
+cloudinit_password = 
+
+template = 
+
+cloudinit_sshkey = <<EOF
+EOF
+
+static_ip_prefix = 
+network_prefix   = 
+network_gateway  = 
