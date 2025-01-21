@@ -62,7 +62,7 @@ resource "proxmox_vm_qemu" "control_planes" {
   # Cloud init Settings
   ciuser     = var.cloudinit_user
   cipassword = var.cloudinit_password
-  ciupgrade  = true
+  ciupgrade  = false
   sshkeys    = var.cloudinit_sshkey
 
   # Setup ip address using cloud-init
