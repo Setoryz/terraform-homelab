@@ -27,9 +27,10 @@ variable "vm_resources" {
     disk   = number
   }))
   default = {
-    control_plane = { cores = 2, memory = 2048, disk = 24 }
+    control_plane = { cores = 2, memory = 4096, disk = 24 }
     worker_large  = { cores = 2, memory = 4096, disk = 48 }
-    worker_small  = { cores = 1, memory = 2048, disk = 24 }
+    worker_small  = { cores = 1, memory = 4096, disk = 36 }
+    node_small    = { cores = 1, memory = 4096, disk = 1024 }
   }
 }
 
@@ -41,7 +42,6 @@ variable "control_planes" {
 
   default = [
     { name = "k8s-ctrl-0", node = "pve-main" },
-    { name = "k8s-ctrl-1", node = "pve-node-1" }
   ]
 }
 
@@ -53,12 +53,24 @@ variable "worker_nodes" {
     index = number
   }))
   default = [
-    { name = "k8s-node-lg-0", node = "pve-main", type = "large", index = 0 },
-    { name = "k8s-node-lg-1", node = "pve-main", type = "large", index = 1 },
-    { name = "k8s-node-lg-2", node = "pve-node-1", type = "large", index = 2 },
+    { name = "k8s-worker-0", node = "pve-main", type = "large", index = 0 },
+    { name = "k8s-worker-1", node = "pve-main", type = "large", index = 1 },
+    { name = "k8s-worker-2", node = "pve-main", type = "large", index = 2 },
+    { name = "k8s-worker-3", node = "pve-node-1", type = "large", index = 3 },
 
-    { name = "k8s-node-sm-0", node = "pve-main", type = "small", index = 0 },
-    { name = "k8s-node-sm-1", node = "pve-main", type = "small", index = 1 },
-    { name = "k8s-node-sm-2", node = "pve-node-1", type = "small", index = 2 },
+    { name = "k8s-worker-sm-0", node = "pve-node-1", type = "small", index = 0 },
+  ]
+}
+
+variable "nfs_nodes" {
+  type = list(object({
+    name    = string
+    node    = string
+    type    = string
+    storage = string
+  }))
+
+  default = [
+    { name = "k8s-nfs-storage", node = "pve-node-1", type = "small", storage = "local-lvm" }
   ]
 }
