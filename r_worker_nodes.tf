@@ -66,6 +66,10 @@ resource "proxmox_vm_qemu" "worker_nodes" {
   ciupgrade  = false
   sshkeys    = var.cloudinit_sshkey
 
+  # DNS Settings
+  searchdomain = var.dns_domain
+  nameserver   = var.dns_nameserver
+
   # Setup ip address using cloud-init
   # Keep in mind to use CIDR notation for the ip
   ipconfig0 = "ip=${var.static_ip_prefix}.${local.worker_suffixes[each.value.type] + tonumber(each.value.index)}/${var.network_prefix},gw=${var.network_gateway}"

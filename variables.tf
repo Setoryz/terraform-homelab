@@ -15,6 +15,9 @@ variable "static_ip_prefix" { type = string }
 variable "network_prefix" { type = string }
 variable "network_gateway" { type = string }
 
+variable "dns_nameserver" { type = string }
+variable "dns_domain" { type = string }
+
 variable "proxmox_nodes" {
   default = ["pve-main", "pve-node-1"]
 }

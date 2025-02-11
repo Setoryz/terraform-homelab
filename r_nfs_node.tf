@@ -65,6 +65,10 @@ resource "proxmox_vm_qemu" "nfs_nodes" {
   ciupgrade  = false
   sshkeys    = var.cloudinit_sshkey
 
+  # DNS Settings
+  # searchdomain = var.dns_domain
+  # nameserver   = var.dns_nameserver
+
   # Setup ip address using cloud-init
   # Keep in mind to use CIDR notation for the ip
   ipconfig0 = "ip=${var.static_ip_prefix}.${local.nfs_node_start_id_suffix + tonumber(each.key)}/${var.network_prefix},gw=${var.network_gateway}"

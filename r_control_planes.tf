@@ -49,7 +49,6 @@ resource "proxmox_vm_qemu" "control_planes" {
     }
   }
 
-
   # Setup Network interface and assign vlan tag
   network {
     id     = 0
@@ -64,6 +63,10 @@ resource "proxmox_vm_qemu" "control_planes" {
   cipassword = var.cloudinit_password
   ciupgrade  = false
   sshkeys    = var.cloudinit_sshkey
+
+  # DNS Settings
+  searchdomain = var.dns_domain
+  nameserver   = var.dns_nameserver
 
   # Setup ip address using cloud-init
   # Keep in mind to use CIDR notation for the ip
