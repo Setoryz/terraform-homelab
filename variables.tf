@@ -88,6 +88,7 @@ variable "hl_vm_nodes" {
   }))
 
   default = [
-    { name = "tailscale", node = "pve-main", type = "mini", storage = "local-lvm" }
+    { name = "tailscale", node = "pve-main", type = "mini", storage = "local-lvm" },
+    { name = "cftunnel", node = "pve-main", type = "mini", storage = "local-lvm" }
   ]
 }
