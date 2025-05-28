@@ -34,6 +34,7 @@ variable "vm_resources" {
     worker_large  = { cores = 2, memory = 4096, disk = 48 }
     worker_small  = { cores = 1, memory = 4096, disk = 36 }
     node_small    = { cores = 1, memory = 4096, disk = 1024 }
+    vm_mini       = { cores = 1, memory = 1024, disk = 8 }
   }
 }
 
@@ -75,5 +76,18 @@ variable "nfs_nodes" {
 
   default = [
     { name = "k8s-nfs-storage", node = "pve-node-1", type = "small", storage = "local-lvm" }
+  ]
+}
+
+variable "hl_vm_nodes" {
+  type = list(object({
+    name    = string
+    node    = string
+    type    = string
+    storage = string
+  }))
+
+  default = [
+    { name = "tailscale", node = "pve-main", type = "mini", storage = "local-lvm" }
   ]
 }
