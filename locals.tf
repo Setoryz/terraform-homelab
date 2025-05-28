@@ -1,9 +1,10 @@
 locals {
-  nfs_node_start_id_suffix      = 110
-  control_plane_start_id_suffix = 150
+  nfs_node_start_id_suffix   = 110
+  hl_vm_node_start_id_suffix = 120
 
-  worker_small_start_id_suffix = 180
-  worker_large_start_id_suffix = 170
+  control_plane_start_id_suffix = 150
+  worker_small_start_id_suffix  = 180
+  worker_large_start_id_suffix  = 170
 }
 
 locals {
