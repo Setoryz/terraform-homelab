@@ -42,9 +42,17 @@ resource "proxmox_vm_qemu" "worker_nodes" {
           size    = var.vm_resources["worker_${each.value.type}"].disk
           cache   = "none"
           storage = "local-lvm"
-          # discard    = true
-          # backup     = true
-          # asyncio    = "io_uring"
+        }
+      }
+
+      dynamic "scsi1" {
+        for_each =  var.vm_resources["worker_${each.value.type}"].longhorn_disk != null ? [1] : []
+        content {
+          disk {
+            size    = var.vm_resources["worker_${each.value.type}"].longhorn_disk
+            cache   = "none"
+            storage = each.value.longhorn_storage
+          }
         }
       }
     }
