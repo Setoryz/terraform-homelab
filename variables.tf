@@ -25,17 +25,23 @@ variable "proxmox_nodes" {
 variable "vm_resources" {
   description = "Configuration for CPU cores and memory for different node types"
   type = map(object({
-    cores         = number
-    memory        = number
-    disk          = number
+    cores         = optional(number)
+    memory        = optional(number)
+    disk          = optional(number)
     longhorn_disk = optional(number)
+    size          = optional(number)
+    source        = optional(string)
   }))
   default = {
     control_plane = { cores = 2, memory = 4096, disk = 24 }
     worker_large  = { cores = 2, memory = 4096, disk = 48, longhorn_disk = 256 }
     worker_small  = { cores = 1, memory = 4096, disk = 36, longhorn_disk = 256 }
     node_small    = { cores = 1, memory = 4096, disk = 1024 }
-    vm_mini       = { cores = 1, memory = 1024, disk = 8 }
+
+    vm_micro  = { cores = 1, memory = 1024, disk = 8 }
+    vm_medium = { cores = 2, memory = 4096, disk = 36 }
+
+    storage_hdd_large = { size = 1024, source = "storage-hdd" }
   }
 }
 
@@ -83,14 +89,17 @@ variable "nfs_nodes" {
 
 variable "hl_vm_nodes" {
   type = list(object({
-    name    = string
-    node    = string
-    type    = string
-    storage = string
+    name        = string
+    node        = string
+    type        = string
+    storage     = string
+    extra_disk  = optional(string)
+    extra_disks = optional(list(string))
   }))
 
   default = [
-    { name = "tailscale", node = "pve-main", type = "mini", storage = "local-lvm" },
-    { name = "cftunnel", node = "pve-main", type = "mini", storage = "local-lvm" }
+    { name = "tailscale", node = "pve-main", type = "micro", storage = "local-lvm" },
+    { name = "cftunnel", node = "pve-main", type = "micro", storage = "local-lvm" },
+    { name = "minio", node = "pve-main", type = "medium", storage = "local-lvm", extra_disk = "hdd_large" }
   ]
 }
