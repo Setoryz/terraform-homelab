@@ -26,6 +26,9 @@ resource "proxmox_vm_qemu" "control_planes" {
   bootdisk = "scsi0"
   onboot   = true
 
+  lifecycle {
+    ignore_changes = [bootdisk]
+  }
   # Setup the disk
   disks {
     ide {

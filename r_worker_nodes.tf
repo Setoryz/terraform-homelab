@@ -27,6 +27,10 @@ resource "proxmox_vm_qemu" "worker_nodes" {
   bootdisk = "scsi0"
   onboot   = true
 
+  lifecycle {
+    ignore_changes = [bootdisk]
+  }
+
   # Setup the disk
   disks {
     ide {
@@ -46,7 +50,7 @@ resource "proxmox_vm_qemu" "worker_nodes" {
       }
 
       dynamic "scsi1" {
-        for_each =  var.vm_resources["worker_${each.value.type}"].longhorn_disk != null ? [1] : []
+        for_each = var.vm_resources["worker_${each.value.type}"].longhorn_disk != null ? [1] : []
         content {
           disk {
             size    = var.vm_resources["worker_${each.value.type}"].longhorn_disk
