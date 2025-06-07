@@ -46,6 +46,17 @@ resource "proxmox_vm_qemu" "hl_vm_nodes" {
           # asyncio    = "io_uring"
         }
       }
+
+      dynamic "scsi1" {
+        for_each = each.value.extra_disk != null ? [1] : []
+        content {
+          disk {
+            size    = var.vm_resources["storage_${each.value.extra_disk}"].size
+            cache   = "none"
+            storage = var.vm_resources["storage_${each.value.extra_disk}"].source
+          }
+        }
+      }
     }
   }
 
