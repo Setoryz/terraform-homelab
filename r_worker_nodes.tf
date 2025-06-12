@@ -19,6 +19,7 @@ resource "proxmox_vm_qemu" "worker_nodes" {
 
   os_type  = "cloud-init"
   memory   = var.vm_resources["worker_${each.value.type}"].memory
+  balloon  = var.vm_resources["worker_${each.value.type}"].balloon
   cores    = var.vm_resources["worker_${each.value.type}"].cores
   sockets  = 1
   vcpus    = 0

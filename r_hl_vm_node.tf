@@ -22,6 +22,7 @@ resource "proxmox_vm_qemu" "hl_vm_nodes" {
   vcpus    = 0
   cpu_type = "host"
   memory   = var.vm_resources["vm_${each.value.type}"].memory
+  balloon  = var.vm_resources["vm_${each.value.type}"].balloon
   scsihw   = "virtio-scsi-pci"
   bootdisk = "scsi0"
   onboot   = true
