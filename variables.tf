@@ -100,9 +100,9 @@ variable "hl_vm_nodes" {
   }))
 
   default = [
-    { name = "tailscale", node = "pve-main", type = "micro", storage = "local-lvm" },
-    { name = "cftunnel", node = "pve-main", type = "micro", storage = "local-lvm" },
+    { name = "tailscale", node = "pve-node-2", type = "micro", storage = "local-lvm" },
+    { name = "cftunnel", node = "pve-node-2", type = "micro", storage = "local-lvm" },
     { name = "minio", node = "pve-main", type = "medium", storage = "local-lvm", extra_disk = "hdd_large" },
-    { name = "docker-priv", node = "pve-main", type = "medium", storage = "local-lvm" }
+    { name = "docker-priv", node = "pve-node-2", type = "medium", storage = "local-lvm" }
   ]
 }
