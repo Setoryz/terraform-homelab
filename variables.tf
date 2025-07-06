@@ -91,18 +91,21 @@ variable "nfs_nodes" {
 
 variable "hl_vm_nodes" {
   type = list(object({
-    name        = string
-    node        = string
-    type        = string
-    storage     = string
-    extra_disk  = optional(string)
-    extra_disks = optional(list(string))
+    name    = string
+    node    = string
+    type    = string
+    storage = string
+
+    clone        = optional(bool)
+    vm_id_suffix = optional(number)
+    extra_disk   = optional(string)
+    extra_disks  = optional(list(string))
   }))
 
   default = [
-    { name = "tailscale", node = "pve-node-2", type = "micro", storage = "local-lvm" },
-    { name = "cftunnel", node = "pve-node-2", type = "micro", storage = "local-lvm" },
-    { name = "minio", node = "pve-main", type = "medium", storage = "local-lvm", extra_disk = "hdd_large" },
-    { name = "docker-priv", node = "pve-node-2", type = "medium", storage = "local-lvm" }
+    { name = "tailscale", node = "pve-node-2", type = "micro", storage = "local-lvm", clone = true },
+    { name = "cftunnel", node = "pve-node-2", type = "micro", storage = "local-lvm", clone = true },
+    { name = "minio", node = "pve-main", type = "medium", storage = "local-lvm", extra_disk = "hdd_large", clone = true },
+    { name = "docker-priv", node = "pve-node-2", type = "medium", storage = "local-lvm", vm_id_suffix = 5, clone = true }
   ]
 }

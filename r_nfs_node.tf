@@ -25,6 +25,7 @@ resource "proxmox_vm_qemu" "nfs_nodes" {
   scsihw   = "virtio-scsi-pci"
   bootdisk = "scsi0"
   onboot   = true
+  startup  = "order=1,up=10"
 
   lifecycle {
     ignore_changes = [bootdisk]

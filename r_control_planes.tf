@@ -25,6 +25,7 @@ resource "proxmox_vm_qemu" "control_planes" {
   scsihw   = "virtio-scsi-pci"
   bootdisk = "scsi0"
   onboot   = true
+  startup  = "order=7,up=10"
 
   lifecycle {
     ignore_changes = [bootdisk]
