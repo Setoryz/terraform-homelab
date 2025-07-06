@@ -27,6 +27,7 @@ resource "proxmox_vm_qemu" "worker_nodes" {
   scsihw   = "virtio-scsi-pci"
   bootdisk = "scsi0"
   onboot   = true
+  startup  = "order=8,up=10"
 
   lifecycle {
     ignore_changes = [bootdisk]

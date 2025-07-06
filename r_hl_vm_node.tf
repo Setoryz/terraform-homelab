@@ -11,7 +11,7 @@ resource "proxmox_vm_qemu" "hl_vm_nodes" {
   # pool = "pool0"
 
   # The template name to clone this vm from
-  clone = var.template
+  clone = each.value.clone ? var.template : null
 
   # Activate QEMU agent for this VM
   agent = 1
@@ -26,6 +26,7 @@ resource "proxmox_vm_qemu" "hl_vm_nodes" {
   scsihw   = "virtio-scsi-pci"
   bootdisk = "scsi0"
   onboot   = true
+  startup  = "order=6,up=10"
 
   lifecycle {
     ignore_changes = [bootdisk]
@@ -87,6 +88,12 @@ resource "proxmox_vm_qemu" "hl_vm_nodes" {
 
   # Setup ip address using cloud-init
   # Keep in mind to use CIDR notation for the ip
-  ipconfig0 = "ip=${var.static_ip_prefix}.${local.hl_vm_node_start_id_suffix + tonumber(each.key)}/${var.network_prefix},gw=${var.network_gateway}"
-  vmid      = "3${local.hl_vm_node_start_id_suffix + tonumber(each.key)}"
+  vmid = (each.value.vm_id_suffix != null ?
+    3000 + each.value.vm_id_suffix :
+    3000 + local.hl_vm_node_start_id_suffix + tonumber(each.key)
+  )
+  ipconfig0 = "ip=${var.static_ip_prefix}.${
+    each.value.vm_id_suffix != null ? each.value.vm_id_suffix :
+    local.hl_vm_node_start_id_suffix + tonumber(each.key)
+  }/${var.network_prefix},gw=${var.network_gateway}"
 }
