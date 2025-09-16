@@ -40,8 +40,9 @@ variable "vm_resources" {
     worker_small  = { cores = 1, memory = 6144, balloon = 4096, disk = 36, longhorn_disk = 256 }
     node_small    = { cores = 1, memory = 4096, disk = 1024 }
 
-    vm_micro  = { cores = 1, memory = 1024, balloon = 512, disk = 8 }
-    vm_medium = { cores = 2, memory = 4096, balloon = 1024, disk = 36 }
+    vm_micro           = { cores = 1, memory = 1024, balloon = 512, disk = 8 }
+    vm_medium          = { cores = 2, memory = 4096, balloon = 1024, disk = 36 }
+    vm_medium_delegate = { cores = 4, memory = 4096, balloon = 1024, disk = 24 }
 
     storage_hdd_large = { size = 1024, source = "storage-hdd" }
   }
@@ -106,6 +107,7 @@ variable "hl_vm_nodes" {
     { name = "tailscale", node = "pve-node-2", type = "micro", storage = "local-lvm", clone = true },
     { name = "cftunnel", node = "pve-node-2", type = "micro", storage = "local-lvm", clone = true },
     { name = "minio", node = "pve-main", type = "medium", storage = "local-lvm", extra_disk = "hdd_large", clone = true },
-    { name = "docker-priv", node = "pve-node-2", type = "medium", storage = "local-lvm", vm_id_suffix = 5, clone = true }
+    { name = "docker-priv", node = "pve-node-2", type = "medium", storage = "local-lvm", vm_id_suffix = 5, clone = true },
+    { name = "harness-delegate-1", node = "pve-node-3", type = "medium_delegate", storage = "local-lvm", vm_id_suffix = 124, clone = true }
   ]
 }
