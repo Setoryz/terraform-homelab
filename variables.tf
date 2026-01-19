@@ -35,16 +35,29 @@ variable "vm_resources" {
     source        = optional(string)
   }))
   default = {
-    control_plane = { cores = 2, memory = 4096, disk = 24 }
-    worker_large  = { cores = 2, memory = 6144, balloon = 4096, disk = 48, longhorn_disk = 256 }
+    control_plane = { cores = 2, memory = 8192, balloon = 6144, disk = 24 }
+    worker_large  = { cores = 2, memory = 8192, balloon = 6144, disk = 48, longhorn_disk = 256 }
     worker_small  = { cores = 1, memory = 6144, balloon = 4096, disk = 36, longhorn_disk = 256 }
     node_small    = { cores = 1, memory = 4096, disk = 1024 }
 
     vm_micro           = { cores = 1, memory = 1024, balloon = 512, disk = 8 }
-    vm_medium          = { cores = 2, memory = 4096, balloon = 1024, disk = 36 }
-    vm_medium_delegate = { cores = 4, memory = 4096, balloon = 1024, disk = 24 }
+    vm_medium          = { cores = 2, memory = 2048, balloon = 1024, disk = 36 }
+    vm_micro_docker    = { cores = 1, memory = 4096, balloon = 2048, disk = 16 }
+    vm_medium_docker   = { cores = 2, memory = 6144, balloon = 4096, disk = 36 }
+    vm_medium_delegate = { cores = 4, memory = 8192, balloon = 6144, disk = 36 }
 
     storage_hdd_large = { size = 1024, source = "storage-hdd" }
+  }
+}
+
+variable "tags" {
+  description = "Tags for VMs"
+  type        = map(string)
+
+  default = {
+    control_planes = "admin;k8s;sensitive"
+    k8s_worker     = "k8s;sensitive"
+
   }
 }
 
@@ -55,7 +68,7 @@ variable "control_planes" {
   }))
 
   default = [
-    { name = "k8s-ctrl-0", node = "pve-main" },
+    { name = "k8s-ctrl-0", node = "pve-n13" },
   ]
 }
 
@@ -72,8 +85,8 @@ variable "worker_nodes" {
     { name = "k8s-worker-1", node = "pve-main", type = "large", index = 1, longhorn_storage = "thinpool-ssd" },
     { name = "k8s-worker-2", node = "pve-main", type = "large", index = 2, longhorn_storage = "thinpool-ssd" },
 
-    { name = "k8s-worker-3", node = "pve-node-1", type = "large", index = 3, longhorn_storage = "local-lvm" },
-    { name = "k8s-worker-sm-0", node = "pve-node-1", type = "small", index = 0, longhorn_storage = "local-lvm" },
+    { name = "k8s-worker-3", node = "pve-n11", type = "large", index = 3, longhorn_storage = "local-lvm" },
+    { name = "k8s-worker-sm-0", node = "pve-n11", type = "small", index = 0, longhorn_storage = "local-lvm" },
   ]
 }
 
@@ -83,10 +96,11 @@ variable "nfs_nodes" {
     node    = string
     type    = string
     storage = string
+    tags    = optional(string)
   }))
 
   default = [
-    { name = "k8s-nfs-storage", node = "pve-node-1", type = "small", storage = "local-lvm" }
+    { name = "k8s-nfs-storage", node = "pve-n11", type = "small", storage = "local-lvm", tags = "k8s;network;storage;sensitive" },
   ]
 }
 
@@ -101,13 +115,14 @@ variable "hl_vm_nodes" {
     vm_id_suffix = optional(number)
     extra_disk   = optional(string)
     extra_disks  = optional(list(string))
+    tags         = optional(string)
   }))
 
   default = [
-    { name = "tailscale", node = "pve-node-2", type = "micro", storage = "local-lvm", clone = true },
-    { name = "cftunnel", node = "pve-node-2", type = "micro", storage = "local-lvm", clone = true },
-    { name = "minio", node = "pve-main", type = "medium", storage = "local-lvm", extra_disk = "hdd_large", clone = true },
-    { name = "docker-priv", node = "pve-node-2", type = "medium", storage = "local-lvm", vm_id_suffix = 5, clone = true },
-    { name = "harness-delegate-1", node = "pve-node-3", type = "medium_delegate", storage = "local-lvm", vm_id_suffix = 124, clone = true }
+    { name = "tailscale", node = "pve-l21", type = "micro", storage = "local-lvm", clone = true, tags = "network;sensitive;tailscale" },
+    { name = "docker-net", node = "pve-l21", type = "micro_docker", storage = "local-lvm", clone = true, tags = "docker;network;sensitive" },
+    { name = "minio", node = "pve-main", type = "medium", storage = "local-lvm", extra_disk = "hdd_large", clone = true, tags = "storage;sensitive" },
+    { name = "docker-priv", node = "pve-n12", type = "medium_docker", storage = "local-lvm", vm_id_suffix = 5, clone = true, tags = "admin;docker;sensitive" },
+    { name = "harness-delegate-1", node = "pve-n12", type = "medium_delegate", storage = "local-lvm", vm_id_suffix = 124, clone = true, tags = "automation;delegate;docker;harness;sensitive" },
   ]
 }
