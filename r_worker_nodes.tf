@@ -1,8 +1,8 @@
 
 resource "proxmox_vm_qemu" "worker_nodes" {
-  for_each = { for idx, cp in var.worker_nodes : idx => cp }
-  name     = each.value.name
-  desc     = each.value.name
+  for_each    = { for idx, cp in var.worker_nodes : idx => cp }
+  name        = each.value.name
+  description = each.value.name
 
   # Node name has to be the same name as within the cluster
   # this might not include the FQDN
@@ -17,17 +17,26 @@ resource "proxmox_vm_qemu" "worker_nodes" {
   # Activate QEMU agent for this VM
   agent = 1
 
-  os_type  = "cloud-init"
-  memory   = var.vm_resources["worker_${each.value.type}"].memory
-  balloon  = var.vm_resources["worker_${each.value.type}"].balloon
-  cores    = var.vm_resources["worker_${each.value.type}"].cores
-  sockets  = 1
-  vcpus    = 0
-  cpu_type = "host"
-  scsihw   = "virtio-scsi-pci"
-  bootdisk = "scsi0"
-  onboot   = true
-  startup  = "order=8,up=10"
+  os_type = "cloud-init"
+  memory  = var.vm_resources["worker_${each.value.type}"].memory
+  balloon = var.vm_resources["worker_${each.value.type}"].balloon
+
+  cpu {
+    cores   = var.vm_resources["worker_${each.value.type}"].cores
+    vcores  = 0
+    sockets = 1
+    type    = "host"
+  }
+
+  scsihw             = "virtio-scsi-pci"
+  bootdisk           = "scsi0"
+  start_at_node_boot = true
+  tags               = var.tags["k8s_worker"]
+
+  startup_shutdown {
+    order         = 8
+    startup_delay = 10
+  }
 
   lifecycle {
     ignore_changes = [bootdisk]

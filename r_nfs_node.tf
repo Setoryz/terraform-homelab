@@ -1,7 +1,7 @@
 resource "proxmox_vm_qemu" "nfs_nodes" {
-  for_each = { for idx, cp in var.nfs_nodes : idx => cp }
-  name     = each.value.name
-  desc     = each.value.name
+  for_each    = { for idx, cp in var.nfs_nodes : idx => cp }
+  name        = each.value.name
+  description = each.value.name
 
   # Node name has to be the same name as within the cluster
   # this might not include the FQDN
@@ -16,16 +16,25 @@ resource "proxmox_vm_qemu" "nfs_nodes" {
   # Activate QEMU agent for this VM
   agent = 1
 
-  os_type  = "cloud-init"
-  cores    = var.vm_resources["node_${each.value.type}"].cores
-  sockets  = 1
-  vcpus    = 0
-  cpu_type = "host"
-  memory   = var.vm_resources["node_${each.value.type}"].memory
-  scsihw   = "virtio-scsi-pci"
-  bootdisk = "scsi0"
-  onboot   = true
-  startup  = "order=1,up=10"
+  os_type = "cloud-init"
+
+  cpu {
+    cores   = var.vm_resources["node_${each.value.type}"].cores
+    vcores  = 0
+    sockets = 1
+    type    = "host"
+  }
+
+  memory             = var.vm_resources["node_${each.value.type}"].memory
+  scsihw             = "virtio-scsi-pci"
+  bootdisk           = "scsi0"
+  start_at_node_boot = true
+  tags               = each.value.tags
+
+  startup_shutdown {
+    order         = 1
+    startup_delay = 10
+  }
 
   lifecycle {
     ignore_changes = [bootdisk]
