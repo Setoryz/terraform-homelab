@@ -50,6 +50,17 @@ variable "vm_resources" {
   }
 }
 
+variable "tags" {
+  description = "Tags for VMs"
+  type        = map(string)
+
+  default = {
+    control_planes = "admin;k8s;sensitive"
+    k8s_worker     = "k8s;sensitive"
+
+  }
+}
+
 variable "control_planes" {
   type = list(object({
     name = string
@@ -85,9 +96,11 @@ variable "nfs_nodes" {
     node    = string
     type    = string
     storage = string
+    tags    = optional(string)
   }))
 
   default = [
+    { name = "k8s-nfs-storage", node = "pve-n11", type = "small", storage = "local-lvm", tags = "k8s;network;storage;sensitive" },
   ]
 }
 
@@ -106,10 +119,10 @@ variable "hl_vm_nodes" {
   }))
 
   default = [
-    { name = "tailscale", node = "pve-node-2", type = "micro", storage = "local-lvm", clone = true },
-    { name = "cftunnel", node = "pve-node-2", type = "micro", storage = "local-lvm", clone = true },
-    { name = "minio", node = "pve-main", type = "medium", storage = "local-lvm", extra_disk = "hdd_large", clone = true },
-    { name = "docker-priv", node = "pve-node-2", type = "medium", storage = "local-lvm", vm_id_suffix = 5, clone = true },
-    { name = "harness-delegate-1", node = "pve-node-3", type = "medium_delegate", storage = "local-lvm", vm_id_suffix = 124, clone = true }
+    { name = "tailscale", node = "pve-l21", type = "micro", storage = "local-lvm", clone = true, tags = "network;sensitive;tailscale" },
+    { name = "docker-net", node = "pve-l21", type = "micro_docker", storage = "local-lvm", clone = true, tags = "docker;network;sensitive" },
+    { name = "minio", node = "pve-main", type = "medium", storage = "local-lvm", extra_disk = "hdd_large", clone = true, tags = "storage;sensitive" },
+    { name = "docker-priv", node = "pve-n12", type = "medium_docker", storage = "local-lvm", vm_id_suffix = 5, clone = true, tags = "admin;docker;sensitive" },
+    { name = "harness-delegate-1", node = "pve-n12", type = "medium_delegate", storage = "local-lvm", vm_id_suffix = 124, clone = true, tags = "automation;delegate;docker;harness;sensitive" },
   ]
 }
