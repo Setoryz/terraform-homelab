@@ -68,7 +68,7 @@ variable "control_planes" {
   }))
 
   default = [
-    { name = "k8s-ctrl-0", node = "pve-n13" },
+    { name = "k8s-ctrl-0", node = "pve-main" },
   ]
 }
 
