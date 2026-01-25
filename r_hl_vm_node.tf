@@ -1,108 +1,34 @@
-resource "proxmox_vm_qemu" "hl_vm_nodes" {
-  for_each    = { for idx, cp in var.hl_vm_nodes : idx => cp }
+module "hl_vm_nodes" {
+  source   = "./modules/proxmox-vm"
+  for_each = { for idx, cp in var.hl_vm_nodes : cp.name => merge(cp, { _idx = idx }) }
+
   name        = each.value.name
-  description = each.value.name
-
-  # Node name has to be the same name as within the cluster
-  # this might not include the FQDN
   target_node = each.value.node
+  clone       = try(each.value.clone, false) ? var.template : null
 
-  # The destination resource pool for the new VM
-  # pool = "pool0"
+  cores   = var.vm_resources["vm_${each.value.type}"].cores
+  memory  = var.vm_resources["vm_${each.value.type}"].memory
+  balloon = var.vm_resources["vm_${each.value.type}"].balloon
 
-  # The template name to clone this vm from
-  clone = each.value.clone ? var.template : null
+  scsi0_size    = var.vm_resources["vm_${each.value.type}"].disk
+  scsi0_storage = each.value.storage
 
-  # Activate QEMU agent for this VM
-  agent = 1
+  scsi1_size    = each.value.extra_disk != null ? var.vm_resources["storage_${each.value.extra_disk}"].size : null
+  scsi1_storage = each.value.extra_disk != null ? var.vm_resources["storage_${each.value.extra_disk}"].source : null
 
-  os_type = "cloud-init"
+  tags          = each.value.tags
+  startup_order = 6
 
-  cpu {
-    cores   = var.vm_resources["vm_${each.value.type}"].cores
-    vcores  = 0
-    sockets = 1
-    type    = "host"
-  }
-
-  memory             = var.vm_resources["vm_${each.value.type}"].memory
-  balloon            = var.vm_resources["vm_${each.value.type}"].balloon
-  scsihw             = "virtio-scsi-pci"
-  bootdisk           = "scsi0"
-  start_at_node_boot = true
-  tags               = each.value.tags
-
-  startup_shutdown {
-    order         = 6
-    startup_delay = 10
-  }
-
-  lifecycle {
-    ignore_changes = [bootdisk]
-  }
-
-  # Setup the disk
-  disks {
-    ide {
-      ide2 {
-        cloudinit {
-          storage = "local-lvm"
-        }
-      }
-    }
-    scsi {
-      scsi0 {
-        disk {
-          size    = var.vm_resources["vm_${each.value.type}"].disk
-          cache   = "none"
-          storage = each.value.storage
-          # discard    = true
-          # backup     = true
-          # asyncio    = "io_uring"
-        }
-      }
-
-      dynamic "scsi1" {
-        for_each = each.value.extra_disk != null ? [1] : []
-        content {
-          disk {
-            size    = var.vm_resources["storage_${each.value.extra_disk}"].size
-            cache   = "none"
-            storage = var.vm_resources["storage_${each.value.extra_disk}"].source
-          }
-        }
-      }
-    }
-  }
-
-
-  # Setup Network interface and assign vlan tag
-  network {
-    id     = 0
-    model  = "virtio"
-    bridge = "vmbr0"
-  }
-
-  boot = "order=scsi0"
-
-  # Cloud init Settings
   ciuser     = var.cloudinit_user
   cipassword = var.cloudinit_password
-  ciupgrade  = false
   sshkeys    = var.cloudinit_sshkey
 
-  # DNS Settings
-  # searchdomain = var.dns_domain
-  # nameserver   = var.dns_nameserver
-
-  # Setup ip address using cloud-init
-  # Keep in mind to use CIDR notation for the ip
   vmid = (each.value.vm_id_suffix != null ?
     3000 + each.value.vm_id_suffix :
-    3000 + local.hl_vm_node_start_id_suffix + tonumber(each.key)
+    3000 + local.hl_vm_node_start_id_suffix + each.value._idx
   )
   ipconfig0 = "ip=${var.static_ip_prefix}.${
     each.value.vm_id_suffix != null ? each.value.vm_id_suffix :
-    local.hl_vm_node_start_id_suffix + tonumber(each.key)
+    local.hl_vm_node_start_id_suffix + each.value._idx
   }/${var.network_prefix},gw=${var.network_gateway}"
 }
