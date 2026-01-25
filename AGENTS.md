@@ -29,6 +29,8 @@ There is no dedicated test framework in this repository. Use:
 
 ## Agent Workflow Requirements
 - At the start of each new task, ask whether to create a new branch and suggest a Conventional Commits-style branch name (for example, `refactor/name-keyed-for-each`).
+- Before proposing changes, confirm they are the safest senior-level approach given the repo constraints (especially no VM recreation and locked VMIDs/IPs).
+- Review the actual file changes locally before asking the user to run any commands.
 - After a task or phase is approved, make a commit using Conventional Commits style.
 - When requested to open a pull request, use `gh pr create` and target the agreed base branch.
 

@@ -1,5 +1,7 @@
 # Terraform Proxmox Refactor Plan (Single Environment)
 
+Date completed: 2026-01-25
+
 ## Goals and Guardrails
 - Keep the current workflow: run `terraform plan` / `terraform apply` from repo root.
 - Reduce duplication across `r_*.tf` files.
