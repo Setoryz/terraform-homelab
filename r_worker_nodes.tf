@@ -27,6 +27,6 @@ module "worker_nodes" {
   searchdomain = var.dns_domain
   nameserver   = var.dns_nameserver
 
-  ipconfig0 = "ip=${var.static_ip_prefix}.${local.worker_suffixes[each.value.type] + tonumber(each.value.index)}/${var.network_prefix},gw=${var.network_gateway}"
-  vmid      = "3${local.worker_suffixes[each.value.type] + tonumber(each.value.index)}"
+  ipconfig0 = "ip=${var.static_ip_prefix}.${local.vmid_suffix_by_name[each.key]}/${var.network_prefix},gw=${var.network_gateway}"
+  vmid      = "3${local.vmid_suffix_by_name[each.key]}"
 }

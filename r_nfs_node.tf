@@ -19,6 +19,6 @@ module "nfs_nodes" {
   cipassword = var.cloudinit_password
   sshkeys    = var.cloudinit_sshkey
 
-  ipconfig0 = "ip=${var.static_ip_prefix}.${local.nfs_node_start_id_suffix + each.value._idx}/${var.network_prefix},gw=${var.network_gateway}"
-  vmid      = "3${local.nfs_node_start_id_suffix + each.value._idx}"
+  ipconfig0 = "ip=${var.static_ip_prefix}.${local.vmid_suffix_by_name[each.key]}/${var.network_prefix},gw=${var.network_gateway}"
+  vmid      = "3${local.vmid_suffix_by_name[each.key]}"
 }

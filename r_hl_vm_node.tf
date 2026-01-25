@@ -23,12 +23,10 @@ module "hl_vm_nodes" {
   cipassword = var.cloudinit_password
   sshkeys    = var.cloudinit_sshkey
 
-  vmid = (each.value.vm_id_suffix != null ?
-    3000 + each.value.vm_id_suffix :
-    3000 + local.hl_vm_node_start_id_suffix + each.value._idx
+  vmid = 3000 + (
+    each.value.vm_id_suffix != null ? each.value.vm_id_suffix : local.vmid_suffix_by_name[each.key]
   )
   ipconfig0 = "ip=${var.static_ip_prefix}.${
-    each.value.vm_id_suffix != null ? each.value.vm_id_suffix :
-    local.hl_vm_node_start_id_suffix + each.value._idx
+    each.value.vm_id_suffix != null ? each.value.vm_id_suffix : local.vmid_suffix_by_name[each.key]
   }/${var.network_prefix},gw=${var.network_gateway}"
 }
