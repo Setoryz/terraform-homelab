@@ -123,6 +123,6 @@ variable "hl_vm_nodes" {
     { name = "docker-net", node = "pve-l21", type = "micro_docker", storage = "local-lvm", clone = true, tags = "docker;network;sensitive" },
     { name = "minio", node = "pve-main", type = "medium", storage = "local-lvm", extra_disk = "hdd_large", clone = true, tags = "storage;sensitive" },
     { name = "docker-priv", node = "pve-n12", type = "medium_docker", storage = "local-lvm", vm_id_suffix = 5, clone = true, tags = "admin;docker;sensitive" },
-    { name = "harness-delegate-1", node = "pve-n12", type = "medium_delegate", storage = "local-lvm", vm_id_suffix = 124, clone = true, tags = "automation;delegate;docker;harness;sensitive" },
+    { name = "harness-delegate-1", node = "pve-n13", type = "medium_delegate", storage = "local-lvm", vm_id_suffix = 124, clone = true, tags = "automation;delegate;docker;harness;sensitive" },
   ]
 }
