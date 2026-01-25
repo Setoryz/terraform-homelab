@@ -1,8 +1,8 @@
 module "control_planes" {
   source   = "./modules/proxmox-vm"
-  for_each = { for idx, cp in var.control_planes : cp.name => merge(cp, { _idx = idx }) }
+  for_each = var.control_planes
 
-  name        = each.value.name
+  name        = each.key
   target_node = each.value.node
   clone       = var.template
 
@@ -22,6 +22,6 @@ module "control_planes" {
   searchdomain = var.dns_domain
   nameserver   = var.dns_nameserver
 
-  ipconfig0 = "ip=${var.static_ip_prefix}.${local.control_plane_start_id_suffix + each.value._idx}/${var.network_prefix},gw=${var.network_gateway}"
-  vmid      = "3${local.control_plane_start_id_suffix + each.value._idx}"
+  ipconfig0 = "ip=${var.static_ip_prefix}.${local.vmid_suffix_by_name[each.key]}/${var.network_prefix},gw=${var.network_gateway}"
+  vmid      = "3${local.vmid_suffix_by_name[each.key]}"
 }

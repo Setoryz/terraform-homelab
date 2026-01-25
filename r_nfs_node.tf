@@ -1,8 +1,8 @@
 module "nfs_nodes" {
   source   = "./modules/proxmox-vm"
-  for_each = { for idx, cp in var.nfs_nodes : cp.name => merge(cp, { _idx = idx }) }
+  for_each = var.nfs_nodes
 
-  name        = each.value.name
+  name        = each.key
   target_node = each.value.node
   clone       = var.template
 
@@ -19,6 +19,6 @@ module "nfs_nodes" {
   cipassword = var.cloudinit_password
   sshkeys    = var.cloudinit_sshkey
 
-  ipconfig0 = "ip=${var.static_ip_prefix}.${local.nfs_node_start_id_suffix + each.value._idx}/${var.network_prefix},gw=${var.network_gateway}"
-  vmid      = "3${local.nfs_node_start_id_suffix + each.value._idx}"
+  ipconfig0 = "ip=${var.static_ip_prefix}.${local.vmid_suffix_by_name[each.key]}/${var.network_prefix},gw=${var.network_gateway}"
+  vmid      = "3${local.vmid_suffix_by_name[each.key]}"
 }
