@@ -1,5 +1,5 @@
 module "nfs_nodes" {
-  source   = "./modules/proxmox-vm"
+  source   = "../../modules/proxmox-vm"
   for_each = var.nfs_nodes
 
   name        = each.key

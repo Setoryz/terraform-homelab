@@ -1,5 +1,5 @@
 module "control_planes" {
-  source   = "./modules/proxmox-vm"
+  source   = "../../modules/proxmox-vm"
   for_each = var.control_planes
 
   name        = each.key

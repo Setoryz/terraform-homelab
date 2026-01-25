@@ -1,5 +1,5 @@
 module "hl_vm_nodes" {
-  source   = "./modules/proxmox-vm"
+  source   = "../../modules/proxmox-vm"
   for_each = var.hl_vm_nodes
 
   name        = each.key

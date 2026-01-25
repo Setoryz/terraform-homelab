@@ -1,6 +1,6 @@
 
 module "worker_nodes" {
-  source   = "./modules/proxmox-vm"
+  source   = "../../modules/proxmox-vm"
   for_each = var.worker_nodes
 
   name        = each.key
