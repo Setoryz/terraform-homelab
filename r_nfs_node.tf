@@ -1,8 +1,8 @@
 module "nfs_nodes" {
   source   = "./modules/proxmox-vm"
-  for_each = { for idx, cp in var.nfs_nodes : cp.name => merge(cp, { _idx = idx }) }
+  for_each = var.nfs_nodes
 
-  name        = each.value.name
+  name        = each.key
   target_node = each.value.node
   clone       = var.template
 

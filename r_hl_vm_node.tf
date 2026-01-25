@@ -1,8 +1,8 @@
 module "hl_vm_nodes" {
   source   = "./modules/proxmox-vm"
-  for_each = { for idx, cp in var.hl_vm_nodes : cp.name => merge(cp, { _idx = idx }) }
+  for_each = var.hl_vm_nodes
 
-  name        = each.value.name
+  name        = each.key
   target_node = each.value.node
   clone       = try(each.value.clone, false) ? var.template : null
 

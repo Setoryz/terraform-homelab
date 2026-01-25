@@ -70,86 +70,71 @@ variable "tags" {
 }
 
 variable "control_planes" {
-  type = list(object({
-    name = string
+  type = map(object({
     node = string
   }))
 
-  default = [
-    { name = "k8s-ctrl-0", node = "pve-main" },
-  ]
-
-  validation {
-    condition     = length(distinct([for n in var.control_planes : n.name])) == length(var.control_planes)
-    error_message = "control_planes names must be unique."
+  default = {
+    k8s-ctrl-0 = { node = "pve-main" }
   }
 
   validation {
-    condition     = alltrue([for n in var.control_planes : contains(var.proxmox_nodes, n.node)])
+    condition     = alltrue([for n in values(var.control_planes) : contains(var.proxmox_nodes, n.node)])
     error_message = "All control_planes.node values must be in var.proxmox_nodes."
   }
 }
 
 variable "worker_nodes" {
-  type = list(object({
-    name             = string
+  type = map(object({
     node             = string
     type             = string
     index            = number
     longhorn_storage = string
   }))
-  default = [
-    { name = "k8s-worker-0", node = "pve-main", type = "large", index = 0, longhorn_storage = "thinpool-ssd" },
-    { name = "k8s-worker-1", node = "pve-main", type = "large", index = 1, longhorn_storage = "thinpool-ssd" },
-    { name = "k8s-worker-2", node = "pve-main", type = "large", index = 2, longhorn_storage = "thinpool-ssd" },
-
-    { name = "k8s-worker-3", node = "pve-n11", type = "large", index = 3, longhorn_storage = "local-lvm" },
-    { name = "k8s-worker-sm-0", node = "pve-n11", type = "small", index = 0, longhorn_storage = "local-lvm" },
-  ]
-
-  validation {
-    condition     = length(distinct([for n in var.worker_nodes : n.name])) == length(var.worker_nodes)
-    error_message = "worker_nodes names must be unique."
+  default = {
+    k8s-worker-0    = { node = "pve-main", type = "large", index = 0, longhorn_storage = "thinpool-ssd" }
+    k8s-worker-1    = { node = "pve-main", type = "large", index = 1, longhorn_storage = "thinpool-ssd" }
+    k8s-worker-2    = { node = "pve-main", type = "large", index = 2, longhorn_storage = "thinpool-ssd" }
+    k8s-worker-3    = { node = "pve-n11", type = "large", index = 3, longhorn_storage = "local-lvm" }
+    k8s-worker-sm-0 = { node = "pve-n11", type = "small", index = 0, longhorn_storage = "local-lvm" }
   }
 
   validation {
-    condition     = length(distinct([for n in var.worker_nodes : "${n.type}:${n.index}"])) == length(var.worker_nodes)
+    condition     = length(distinct([for n in values(var.worker_nodes) : "${n.type}:${n.index}"])) == length(var.worker_nodes)
     error_message = "worker_nodes must not reuse the same type+index (vmid/ip collision risk)."
   }
 
   validation {
-    condition     = alltrue([for n in var.worker_nodes : contains(var.proxmox_nodes, n.node)])
+    condition     = alltrue([for n in values(var.worker_nodes) : contains(var.proxmox_nodes, n.node)])
     error_message = "All worker_nodes.node values must be in var.proxmox_nodes."
   }
 }
 
 variable "nfs_nodes" {
-  type = list(object({
-    name    = string
+  type = map(object({
     node    = string
     type    = string
     storage = string
     tags    = optional(string)
   }))
 
-  default = [
-    { name = "k8s-nfs-storage", node = "pve-n11", type = "small", storage = "local-lvm", tags = "k8s;network;storage;sensitive" },
-  ]
-
-  validation {
-    condition     = length(distinct([for n in var.nfs_nodes : n.name])) == length(var.nfs_nodes)
-    error_message = "nfs_nodes names must be unique."
+  default = {
+    k8s-nfs-storage = {
+      node    = "pve-n11"
+      type    = "small"
+      storage = "local-lvm"
+      tags    = "k8s;network;storage;sensitive"
+    }
   }
 
   validation {
-    condition     = alltrue([for n in var.nfs_nodes : contains(var.proxmox_nodes, n.node)])
+    condition     = alltrue([for n in values(var.nfs_nodes) : contains(var.proxmox_nodes, n.node)])
     error_message = "All nfs_nodes.node values must be in var.proxmox_nodes."
   }
 }
 
 variable "hl_vm_nodes" {
-  type = list(object({
-    name    = string
+  type = map(object({
     node    = string
     type    = string
     storage = string
@@ -161,31 +146,26 @@ variable "hl_vm_nodes" {
     tags         = optional(string)
   }))
 
-  default = [
-    { name = "tailscale", node = "pve-l21", type = "micro", storage = "local-lvm", clone = true, tags = "network;sensitive;tailscale" },
-    { name = "docker-net", node = "pve-l21", type = "micro_docker", storage = "local-lvm", clone = true, tags = "docker;network;sensitive" },
-    { name = "minio", node = "pve-main", type = "medium", storage = "local-lvm", extra_disk = "hdd_large", clone = true, tags = "storage;sensitive" },
-    { name = "docker-priv", node = "pve-n12", type = "medium_docker", storage = "local-lvm", vm_id_suffix = 5, clone = true, tags = "admin;docker;sensitive" },
-    { name = "harness-delegate-1", node = "pve-n13", type = "medium_delegate", storage = "local-lvm", vm_id_suffix = 124, clone = true, tags = "automation;delegate;docker;harness;sensitive" },
-    { name = "harness-delegate-2", node = "pve-n13", type = "medium_delegate", storage = "local-lvm", vm_id_suffix = 125, clone = true, tags = "automation;delegate;docker;harness;sensitive" },
-  ]
-
-  validation {
-    condition     = length(distinct([for n in var.hl_vm_nodes : n.name])) == length(var.hl_vm_nodes)
-    error_message = "hl_vm_nodes names must be unique."
+  default = {
+    tailscale          = { node = "pve-l21", type = "micro", storage = "local-lvm", clone = true, tags = "network;sensitive;tailscale" }
+    docker-net         = { node = "pve-l21", type = "micro_docker", storage = "local-lvm", clone = true, tags = "docker;network;sensitive" }
+    minio              = { node = "pve-main", type = "medium", storage = "local-lvm", extra_disk = "hdd_large", clone = true, tags = "storage;sensitive" }
+    docker-priv        = { node = "pve-n12", type = "medium_docker", storage = "local-lvm", vm_id_suffix = 5, clone = true, tags = "admin;docker;sensitive" }
+    harness-delegate-1 = { node = "pve-n13", type = "medium_delegate", storage = "local-lvm", vm_id_suffix = 124, clone = true, tags = "automation;delegate;docker;harness;sensitive" }
+    harness-delegate-2 = { node = "pve-n13", type = "medium_delegate", storage = "local-lvm", vm_id_suffix = 125, clone = true, tags = "automation;delegate;docker;harness;sensitive" }
   }
 
   validation {
     condition = length(distinct([
-      for n in var.hl_vm_nodes : n.vm_id_suffix if n.vm_id_suffix != null
+      for n in values(var.hl_vm_nodes) : n.vm_id_suffix if n.vm_id_suffix != null
       ])) == length([
-      for n in var.hl_vm_nodes : n.vm_id_suffix if n.vm_id_suffix != null
+      for n in values(var.hl_vm_nodes) : n.vm_id_suffix if n.vm_id_suffix != null
     ])
     error_message = "hl_vm_nodes vm_id_suffix values must be unique when set."
   }
 
   validation {
-    condition     = alltrue([for n in var.hl_vm_nodes : contains(var.proxmox_nodes, n.node)])
+    condition     = alltrue([for n in values(var.hl_vm_nodes) : contains(var.proxmox_nodes, n.node)])
     error_message = "All hl_vm_nodes.node values must be in var.proxmox_nodes."
   }
 }

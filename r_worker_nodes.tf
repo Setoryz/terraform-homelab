@@ -1,9 +1,9 @@
 
 module "worker_nodes" {
   source   = "./modules/proxmox-vm"
-  for_each = { for idx, cp in var.worker_nodes : cp.name => cp }
+  for_each = var.worker_nodes
 
-  name        = each.value.name
+  name        = each.key
   target_node = each.value.node
   clone       = var.template
 

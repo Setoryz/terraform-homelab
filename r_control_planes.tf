@@ -1,8 +1,8 @@
 module "control_planes" {
   source   = "./modules/proxmox-vm"
-  for_each = { for idx, cp in var.control_planes : cp.name => merge(cp, { _idx = idx }) }
+  for_each = var.control_planes
 
-  name        = each.value.name
+  name        = each.key
   target_node = each.value.node
   clone       = var.template
 
