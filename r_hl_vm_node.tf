@@ -1,5 +1,5 @@
 resource "proxmox_vm_qemu" "hl_vm_nodes" {
-  for_each    = { for idx, cp in var.hl_vm_nodes : idx => cp }
+  for_each    = { for idx, cp in var.hl_vm_nodes : cp.name => merge(cp, { _idx = idx }) }
   name        = each.value.name
   description = each.value.name
 
@@ -99,10 +99,10 @@ resource "proxmox_vm_qemu" "hl_vm_nodes" {
   # Keep in mind to use CIDR notation for the ip
   vmid = (each.value.vm_id_suffix != null ?
     3000 + each.value.vm_id_suffix :
-    3000 + local.hl_vm_node_start_id_suffix + tonumber(each.key)
+    3000 + local.hl_vm_node_start_id_suffix + each.value._idx
   )
   ipconfig0 = "ip=${var.static_ip_prefix}.${
     each.value.vm_id_suffix != null ? each.value.vm_id_suffix :
-    local.hl_vm_node_start_id_suffix + tonumber(each.key)
+    local.hl_vm_node_start_id_suffix + each.value._idx
   }/${var.network_prefix},gw=${var.network_gateway}"
 }

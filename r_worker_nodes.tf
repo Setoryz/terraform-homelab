@@ -1,6 +1,6 @@
 
 resource "proxmox_vm_qemu" "worker_nodes" {
-  for_each    = { for idx, cp in var.worker_nodes : idx => cp }
+  for_each    = { for idx, cp in var.worker_nodes : cp.name => cp }
   name        = each.value.name
   description = each.value.name
 
