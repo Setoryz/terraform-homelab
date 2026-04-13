@@ -54,7 +54,7 @@ variable "vm_resources" {
     vm_medium_docker   = { cores = 2, memory = 6144, balloon = 4096, disk = 36 }
     vm_medium_delegate = { cores = 4, memory = 8192, balloon = 6144, disk = 36 }
 
-    storage_hdd_large = { size = 1024, source = "storage-hdd" }
+    storage_hdd_large = { size = 512, source = "storage-main" }
   }
 }
 
