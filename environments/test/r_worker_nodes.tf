@@ -1,9 +1,9 @@
 
 module "worker_nodes" {
-  source   = "./modules/proxmox-vm"
+  source   = "../../modules/proxmox-vm"
   for_each = var.worker_nodes
 
-  name        = each.key
+  name        = "${local.name_prefix}${each.key}"
   target_node = each.value.node
   clone       = var.template
 
@@ -28,5 +28,5 @@ module "worker_nodes" {
   nameserver   = var.dns_nameserver
 
   ipconfig0 = "ip=${var.static_ip_prefix}.${local.vmid_suffix_by_name[each.key]}/${var.network_prefix},gw=${var.network_gateway}"
-  vmid      = "3${local.vmid_suffix_by_name[each.key]}"
+  vmid      = "2${local.vmid_suffix_by_name[each.key]}"
 }

@@ -1,12 +1,13 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-This repository is a single Terraform configuration for Proxmox. The root directory holds all HCL sources:
-- Core configuration: `main.tf`, `provider.tf`, `variables.tf`, `locals.tf`.
-- Resource groups are split by role in `r_control_planes.tf`, `r_worker_nodes.tf`, `r_nfs_node.tf`, and `r_hl_vm_node.tf`.
-- Inputs live in `terraform.tfvars` (local, uncommitted) with a template at `terraform.tfvars.sample`. The provider is pinned in `.terraform.lock.hcl`.
+This repository uses an environment root and shared modules:
+- Environment root: `environments/homelab/` contains `provider.tf`, `variables.tf`, `locals.tf`, `moved.tf`, and the `r_*.tf` files.
+- Shared modules: `modules/proxmox-vm/` holds the reusable VM module.
+- Inputs live in `terraform.tfvars` (local, uncommitted) with a template at `terraform.tfvars.sample`. The provider lock file is at `environments/homelab/.terraform.lock.hcl`.
 
 ## Build, Test, and Development Commands
+Run Terraform from `environments/homelab/`:
 - `terraform init` initializes the working directory and configures the backend.
 - `terraform fmt` formats all Terraform files to the standard style.
 - `terraform validate` performs a static validation of the configuration.

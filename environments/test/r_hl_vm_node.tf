@@ -1,8 +1,8 @@
 module "hl_vm_nodes" {
-  source   = "./modules/proxmox-vm"
+  source   = "../../modules/proxmox-vm"
   for_each = var.hl_vm_nodes
 
-  name        = each.key
+  name        = "${local.name_prefix}${each.key}"
   target_node = each.value.node
   clone       = try(each.value.clone, false) ? var.template : null
 
@@ -23,7 +23,7 @@ module "hl_vm_nodes" {
   cipassword = var.cloudinit_password
   sshkeys    = var.cloudinit_sshkey
 
-  vmid = 3000 + (
+  vmid = 2000 + (
     each.value.vm_id_suffix != null ? each.value.vm_id_suffix : local.vmid_suffix_by_name[each.key]
   )
   ipconfig0 = "ip=${var.static_ip_prefix}.${
