@@ -9,6 +9,11 @@ Minimum safeguards for test:
 - Use a separate backend/state (via `terraform init -backend-config=...`).
 - Use unique VM names, VMIDs, and IPs.
 
+This repo enforces basic isolation in `environments/test/`:
+- VM names are prefixed with `test-`.
+- VMID/IP suffixes use a separate range.
+- Recommended IP range is `10.0.2.x`.
+
 Suggested workflow:
 1) Copy the sample var file: `cp terraform.test.tfvars.sample terraform.test.tfvars`
 2) Update `terraform.test.tfvars` with test-specific values.

@@ -32,3 +32,7 @@ locals {
     harness-delegate-2 = 125
   }
 }
+
+locals {
+  name_prefix = "test-"
+}

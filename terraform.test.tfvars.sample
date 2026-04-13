@@ -10,7 +10,7 @@ template =
 cloudinit_sshkey = <<EOF
 EOF
 
-static_ip_prefix =
+static_ip_prefix = "10.0.2"
 network_prefix   =
 network_gateway  =
 
